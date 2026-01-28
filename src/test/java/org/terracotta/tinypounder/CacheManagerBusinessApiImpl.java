@@ -134,8 +134,6 @@ public class CacheManagerBusinessApiImpl implements CacheManagerBusiness {
         CacheManagerBuilder.newCacheManagerBuilder()
             .with(ClusteringServiceConfigurationBuilder.cluster(clusterUri)
                 .autoCreate().defaultServerResource("offheap-1")
-                .resourcePool("resource-pool-a", 128, MemoryUnit.MB, "offheap-2")
-                .resourcePool("resource-pool-b", 64, MemoryUnit.MB)
             ).with(new CacheManagerPersistenceConfiguration(tinyPounderDiskPersistenceLocationFolder))
         ;
 

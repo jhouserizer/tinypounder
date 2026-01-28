@@ -41,6 +41,8 @@ public class ApplicationReadyListener implements ApplicationListener<Application
       }
     } else if (IS_MAC) {
       openUrlInBrowser(uri.toString());
+    } else {
+      System.err.println("Desktop not supported. Visit '" + uri + "' in your browser.");
     }
   }
 

@@ -129,7 +129,6 @@ public class CacheManagerBusinessReflectionImpl implements CacheManagerBusiness 
 
   @Override
   public Collection<String> retrieveCacheNames() {
-
     try {
       Thread.currentThread().setContextClassLoader(kitAwareClassLoaderDelegator.getUrlClassLoader());
 
@@ -144,7 +143,6 @@ public class CacheManagerBusinessReflectionImpl implements CacheManagerBusiness 
       throw new RuntimeException(e);
     }
   }
-
 
   @Override
   public void createCache(String alias, CacheConfiguration cacheConfiguration) {
@@ -233,7 +231,6 @@ public class CacheManagerBusinessReflectionImpl implements CacheManagerBusiness 
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-
   }
 
   @Override
@@ -278,7 +275,6 @@ public class CacheManagerBusinessReflectionImpl implements CacheManagerBusiness 
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-
   }
 
   private Object constructDefaultManagementRegistryConfiguration(String cmName) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -312,7 +308,6 @@ public class CacheManagerBusinessReflectionImpl implements CacheManagerBusiness 
     Method withConfigurationMethod = cacheManagerBuilderClass.getMethod("with", cacheManagerConfigurationClass);
     Class<?> serviceCreationConfigurationClass = loadClass("org.ehcache.spi.service.ServiceCreationConfiguration");
 
-
     Object cacheManagerBuilder = newCacheManagerBuilderMethod.invoke(null);
     if (enterpriseClusteringServiceConfigurationBuilder != null) {
       cacheManagerBuilder = withBuilderMethod.invoke(cacheManagerBuilder, enterpriseClusteringServiceConfigurationBuilder);
@@ -329,7 +324,6 @@ public class CacheManagerBusinessReflectionImpl implements CacheManagerBusiness 
   }
 
   private Object constructClusteringServiceConfigurationBuilder(String clusterTierManagerName, URI clusterUri, boolean eeKit, String defaultOffheapResource, String serverDiskResource, String securityPath) throws IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
-
     Class<?> memoryUnitClass = loadClass("org.ehcache.config.units.MemoryUnit");
     Method valueOfMethod = memoryUnitClass.getMethod("valueOf", String.class);
     Object mB = valueOfMethod.invoke(null, "MB");
@@ -339,18 +333,14 @@ public class CacheManagerBusinessReflectionImpl implements CacheManagerBusiness 
     try {
       timeoutsClass = loadClass("org.ehcache.clustered.client.config.Timeouts");
       Constructor timeoutsClassConstructor = timeoutsClass.getConstructor(new Class[]{Duration.class, Duration.class, Duration.class});
-      timeoutsInstance = timeoutsClassConstructor.newInstance(Duration.ofSeconds(5), Duration.ofSeconds(5), Duration.ofSeconds(5));
+      timeoutsInstance = timeoutsClassConstructor.newInstance(Duration.ofSeconds(5), Duration.ofSeconds(5), Duration.ofSeconds(120));
     } catch (Exception e) {
       // nevermind, the api wrt timeouts is fairly recent, 3.5.x, so if running an old ehcache, we won't configure timeouts; oh well...
     }
 
     if (eeKit) {
-
       Class<?> enterpriseServerSideConfigurationBuilderClass = loadClass("com.terracottatech.ehcache.clustered.client.config.builders.EnterpriseServerSideConfigurationBuilder");
-
-
       Class<?> enterpriseClusteringServiceConfigurationBuilderClass = loadClass("com.terracottatech.ehcache.clustered.client.config.builders.EnterpriseClusteringServiceConfigurationBuilder");
-
 
       Method autoCreateMethod = enterpriseClusteringServiceConfigurationBuilderClass.getMethod("autoCreate");
       Method defaultServerResourceMethod = enterpriseServerSideConfigurationBuilderClass.getMethod("defaultServerResource", String.class);
@@ -388,7 +378,6 @@ public class CacheManagerBusinessReflectionImpl implements CacheManagerBusiness 
       Method resourcePoolMethod4 = serverSideConfigurationBuilderClass.getMethod("resourcePool", String.class, long.class, memoryUnitClass, String.class);
       Method resourcePoolMethod3 = serverSideConfigurationBuilderClass.getMethod("resourcePool", String.class, long.class, memoryUnitClass);
 
-
       Object clusteringServiceConfigurationBuilder = clusterMethod.invoke(null, clusterUri.resolve(clusterTierManagerName));
       if (timeoutsClass != null && timeoutsInstance != null) {
         Method timeoutsMethod = clusteringServiceConfigurationBuilderClass.getMethod("timeouts", timeoutsClass);
@@ -400,8 +389,6 @@ public class CacheManagerBusinessReflectionImpl implements CacheManagerBusiness 
       serverSideConfigurationBuilder = resourcePoolMethod3.invoke(serverSideConfigurationBuilder, "resource-pool-b", 64L, mB);
       return serverSideConfigurationBuilder;
     }
-
-
   }
 
   private Object defaultCacheConfigurationHeapOffHeapDedicatedClustered(CacheConfiguration cacheConfiguration) throws Exception {
@@ -495,7 +482,6 @@ public class CacheManagerBusinessReflectionImpl implements CacheManagerBusiness 
         .map(Path::toFile)
         .forEach(File::delete);
   }
-
 
   @Override
   public boolean isCacheManagerAlive() {

@@ -63,7 +63,7 @@
         <dependency>
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache-clustered</artifactId>
-            <version>3.10.6</version>
+            <version>3.12.0-internal5</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -204,13 +204,13 @@ public class DatasetManagerBusinessReflectionImpl {
   }
 
   private Object retrieveDatasetWriterReader(Object datasetInstance) throws Exception {
-    Class<?> internalDatasetClass = loadClass("com.terracottatech.store.internal.InternalDataset");
+    Class<?> internalDatasetClass = loadClass("com.terracottatech.store.internal.ManagementInternalDataset");
     Method writerReader = internalDatasetClass.getMethod("writerReader");
     return writerReader.invoke(datasetInstance);
   }
 
   private Object retrieveDatasetReader(Object datasetInstance) throws Exception {
-    Class<?> internalDatasetClass = loadClass("com.terracottatech.store.internal.InternalDataset");
+    Class<?> internalDatasetClass = loadClass("com.terracottatech.store.internal.ManagementInternalDataset");
     Method reader = internalDatasetClass.getMethod("reader");
     return reader.invoke(datasetInstance);
   }
@@ -535,7 +535,7 @@ public class DatasetManagerBusinessReflectionImpl {
   }
 
   private String getInstanceName(Object datasetInstance) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-    Class<?> manageableDatasetClass = loadClass("com.terracottatech.store.internal.InternalDataset");
+    Class<?> manageableDatasetClass = loadClass("com.terracottatech.store.internal.ManagementInternalDataset");
     Method getStatisticsMethod = manageableDatasetClass.getMethod("getStatistics");
     Object datasetStatistics = getStatisticsMethod.invoke(datasetInstance);
     Class<?> datasetStatisticsClass = loadClass("com.terracottatech.store.statistics.DatasetStatistics");
@@ -557,7 +557,7 @@ public class DatasetManagerBusinessReflectionImpl {
     try {
       Thread.currentThread().setContextClassLoader(kitAwareClassLoaderDelegator.getUrlClassLoader());
 
-      Class<?> internalDatasetManagerClass = loadClass("com.terracottatech.store.internal.InternalDatasetManager");
+      Class<?> internalDatasetManagerClass = loadClass("com.terracottatech.store.internal.ManagementInternalDatasetManager");
       Class<?> statisticsServiceClass = loadClass("com.terracottatech.store.statistics.StatisticsService");
       Method getStatisticsServiceMethod = internalDatasetManagerClass.getMethod("getStatisticsService");
       Method getDatasetInstanceNamesMethod = statisticsServiceClass.getMethod("getDatasetInstanceNames");

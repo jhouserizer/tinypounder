@@ -646,7 +646,7 @@ public class TinyPounderMainUI extends UI {
   }
 
   private boolean isDynamicConfig() {
-    return Paths.get(settings.getKitPath(), "init").toFile().exists();
+    return Paths.get(settings.getKitPath(), "tools", "bin", "config-tool.sh").toFile().exists();
   }
 
   private void startServer(String clusterName, String stripeName, String serverName, String hostname, String clientPort,
@@ -1171,6 +1171,20 @@ public class TinyPounderMainUI extends UI {
 
     StringBuilder sb = new StringBuilder();
 
+    if (ee) {
+      if (serverSecurityCheckBox.getValue()) {
+        String securityRootDir = serverSecurityField.getValue();
+        if (securityRootDir.endsWith("-ldap")) {
+          sb.append("authc=ldap" + System.lineSeparator());
+        } else if (securityRootDir.endsWith("-file")) {
+          sb.append("authc=file" + System.lineSeparator());
+        } else {
+          sb.append("authc=certificate" + System.lineSeparator());
+        }
+        sb.append("ssl-tls=true" + System.lineSeparator());
+      }
+    }
+
     if (offheapGrid.getRows() > 1) {
       List<String> offheapList = new ArrayList<>();
       for (int r = 1; r < offheapGrid.getRows(); r++) {
@@ -1220,7 +1234,10 @@ public class TinyPounderMainUI extends UI {
 
           if (ee) {
             if (serverSecurityCheckBox.getValue()) {
-              sb.append("security-dir=" + createPath(serverSecurityField.getValue()) + System.lineSeparator());
+              File auditLogDir = new File(baseLocation.getValue(), "security-audit-log");
+              auditLogDir.mkdirs();
+              sb.append(nodePrefix + "audit-log-dir=" + auditLogDir.getAbsolutePath() + System.lineSeparator());
+              sb.append(nodePrefix + "security-dir=" + createPath(serverSecurityField.getValue()) + System.lineSeparator());
             }
 
             if (platformPersistence.getValue()) {
@@ -1453,12 +1470,12 @@ public class TinyPounderMainUI extends UI {
     cacheNameField.addStyleName("align-bottom");
     cacheCreation.addComponent(cacheNameField);
 
-    List<Long> onHeapValues = Arrays.asList(0L, 1L, 10L, 100L, 1000L, 10_000L);
+    List<Long> onHeapValues = Arrays.asList(0L, 1L, 5L, 10L, 50L, 100L, 500L, 1000L, 5_000L, 10_000L);
     ComboBox<Long> onHeapSizeComboBox = new ComboBox<>("OnHeap size", onHeapValues);
     onHeapSizeComboBox.addStyleName("small-combo");
     onHeapSizeComboBox.setTextInputAllowed(false);
     onHeapSizeComboBox.setEmptySelectionAllowed(false);
-    onHeapSizeComboBox.setValue(onHeapValues.get(3));
+    onHeapSizeComboBox.setValue(onHeapValues.get(4));
     cacheCreation.addComponent(onHeapSizeComboBox);
 
     List<String> onHeapUnitValues = Arrays.asList("ENTRIES", "KB", "MB", "GB");
@@ -1468,7 +1485,7 @@ public class TinyPounderMainUI extends UI {
     onHeapUnitComboBox.setTextInputAllowed(false);
     cacheCreation.addComponent(onHeapUnitComboBox);
 
-    List<Long> offHeapValues = Arrays.asList(0L, 1L, 10L, 100L, 1000L, 10_000L);
+    List<Long> offHeapValues = Arrays.asList(0L, 1L, 5L, 10L, 50L, 100L, 500L, 1000L, 5_000L, 10_000L);
     ComboBox<Long> offHeapSizeComboBox = new ComboBox<>("Offheap size", offHeapValues);
     offHeapSizeComboBox.addStyleName("small-combo");
     offHeapSizeComboBox.setTextInputAllowed(false);
@@ -1484,7 +1501,7 @@ public class TinyPounderMainUI extends UI {
     offHeapUnitComboBox.setTextInputAllowed(false);
     cacheCreation.addComponent(offHeapUnitComboBox);
 
-    List<Long> diskValues = Arrays.asList(0L, 1L, 10L, 100L, 1000L, 10_000L);
+    List<Long> diskValues = Arrays.asList(0L, 1L, 5L, 10L, 50L, 100L, 500L, 1000L, 5_000L, 10_000L);
     ComboBox<Long> diskSizeComboBox = new ComboBox<>("Disk size", diskValues);
     diskSizeComboBox.addStyleName("small-combo");
     diskSizeComboBox.setEmptySelectionAllowed(false);
@@ -1504,7 +1521,7 @@ public class TinyPounderMainUI extends UI {
     ComboBox<String> clusteredComboBox = new ComboBox<>("Clustered tier", clusteredValues);
     clusteredComboBox.setEmptySelectionAllowed(false);
     clusteredComboBox.setTextInputAllowed(false);
-    clusteredComboBox.setValue(clusteredValues.get(2));
+    clusteredComboBox.setValue(clusteredValues.get(1));
     cacheCreation.addComponent(clusteredComboBox);
 
     Button addCacheButton = new Button("Add cache");
@@ -1514,7 +1531,6 @@ public class TinyPounderMainUI extends UI {
     ListDataProvider<String> listDataProvider = new ListDataProvider<>(cacheNames);
     addCacheButton.addClickListener(clickEvent -> {
       try {
-
         String clusteredComboBoxValue = clusteredComboBox.getValue();
         CacheConfiguration.ClusterTierType clusterTierType = CacheConfiguration.ClusterTierType.NONE;
         int clusteredDedicatedSize = 0;
