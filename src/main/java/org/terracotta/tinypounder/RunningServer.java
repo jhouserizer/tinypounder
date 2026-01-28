@@ -61,7 +61,7 @@ class RunningServer {
   void start() {
     String script = new File(workDir, "server/bin/start-tc-server." + (ProcUtils.isWindows() ? "bat" : "sh")).getAbsolutePath();
     String command;
-    if (new File(workDir, "init").exists()) {
+    if (Paths.get(workDir.toPath().toString(), "tools", "bin", "config-tool.sh").toFile().exists()) {
       Path nodeRepoPath = Paths.get(System.getProperty("user.home"), "terracotta", clusterName, "data",
           "config-db", stripeName, serverName);
       command = script
